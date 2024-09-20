@@ -1,30 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace GradeCalculator
+﻿namespace GradeCalculator
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            ListOfModules(); 
+            ListofModules(); // Call the function to enter multiple modules
         }
 
-        public static void ListOfModules()
+        public static void ListofModules()
         {
-          
+            // Ask user for the number of modules
             Console.WriteLine("How many modules would you like to enter?");
             int numberOfModules = Convert.ToInt32(Console.ReadLine());
 
-          
+            // Create a list to store the modules
             List<modules> moduleList = new List<modules>();
 
-            // Loop to gather module data
+            // Loop through to gather module data
             for (int i = 0; i < numberOfModules; i++)
             {
                 modules a;
-
-                Console.WriteLine($"\nEnter details for Module {i + 1}:");
+                Console.WriteLine("\n");
+                Console.WriteLine($"Enter details for Module {i + 1}:");
 
                 Console.WriteLine("What is the module ID?");
                 a.ID = Convert.ToInt32(Console.ReadLine());
@@ -38,54 +35,80 @@ namespace GradeCalculator
                 Console.WriteLine("What is your mark for this module?");
                 a.Mark = Convert.ToInt32(Console.ReadLine());
 
-                // Assign grade based on the mark
+                // Assign classification based on the mark
                 a.Grade = Grade(a.Mark);
 
-                // Add module to list
+                // Add the module to the list
                 moduleList.Add(a);
             }
 
             // Display all module information
-            Console.WriteLine("\nList of Modules, Marks, and Grades Entered:");
+            Console.WriteLine("\nList of Modules, Marks, and Classifications Entered:");
             foreach (var module in moduleList)
             {
                 Console.WriteLine($"Module: {module.title}, ID: {module.ID}, Credits: {module.credits}, Mark: {module.Mark}, Grade: {module.Grade}");
             }
+
+            // Calculate the Best Average (excluding the worst mark)
+            double bestAverage = CalculateBestAverage(moduleList);
+            Console.WriteLine($"\nBest Average (excluding worst mark): {bestAverage:F2}");
         }
 
-        //  grade marks based on the boundaries
-        public static Grades Grade(int mark)
+        // Function to classify marks based on the boundaries
+        public static Classification Grade(int mark)
         {
             if (mark >= 70)
-                return Grades._1;
+                return Classification._1;
             else if (mark >= 60)
-                return Grades._21;
+                return Classification._21;
             else if (mark >= 50)
-                return Grades._22;
+                return Classification._22;
             else if (mark >= 40)
-                return Grades._3;
+                return Classification._3;
             else
-                return Grades._U;
+                return Classification._U;
         }
 
-   
+        // Function to calculate the Best Average (removing the worst grade)
+        public static double CalculateBestAverage(List<modules> moduleList)
+        {
+            if (moduleList.Count <= 1)
+            {
+                // If there's only one module, return the mark of that module as the "best average"
+                return moduleList.First().Mark;
+            }
+
+            // Find the minimum mark (the worst grade)
+            int worstMark = moduleList.Min(m => m.Mark);
+           
+            // Calculate the sum of all marks except the worst mark
+            int totalMarksWithoutWorst = moduleList.Where(m => m.Mark != worstMark).Sum(m => m.Mark);
+
+            // Get the number of remaining modules (after removing the worst one)
+            int remainingModuleCount = moduleList.Count - 1;
+
+            // Calculate the average of the remaining marks
+            return (double)totalMarksWithoutWorst / remainingModuleCount;
+        }
+
+        // Define the modules struct
         public struct modules
         {
             public int ID;
             public string title;
             public int credits;
             public int Mark;
-            public Grades Grade; 
+            public Classification Grade; // New field for classification
         }
 
- 
-        public enum Grades
+        // Define the enum for classification
+        public enum Classification
         {
-            _1,  
-            _21, 
-            _22, 
-            _3, 
-            _U   
+            _1,  // First class (70 and above)
+            _21, // Upper second class (60-69)
+            _22, // Lower second class (50-59)
+            _3,  // Third class (40-49)
+            _U   // Fail (Below 40)
         }
     }
 }
