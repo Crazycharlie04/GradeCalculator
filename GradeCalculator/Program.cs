@@ -78,18 +78,22 @@
                 return moduleList.First().Mark;
             }
 
-            // Find the minimum mark (the worst grade)
-            int worstMark = moduleList.Min(m => m.Mark);
-           
-            // Calculate the sum of all marks except the worst mark
-            int totalMarksWithoutWorst = moduleList.Where(m => m.Mark != worstMark).Sum(m => m.Mark);
+            // Sort the module list by marks in ascending order
+            var sortedModules = moduleList.OrderBy(m => m.Mark).ToList();
+
+            // Remove the module with the worst mark (which is the first in the sorted list)
+            sortedModules.RemoveAt(0);
+
+            // Calculate the sum of the remaining marks
+            int totalMarksWithoutWorst = sortedModules.Sum(m => m.Mark);
 
             // Get the number of remaining modules (after removing the worst one)
-            int remainingModuleCount = moduleList.Count - 1;
+            int remainingModuleCount = sortedModules.Count;
 
             // Calculate the average of the remaining marks
             return (double)totalMarksWithoutWorst / remainingModuleCount;
         }
+
 
         // Define the modules struct
         public struct modules
